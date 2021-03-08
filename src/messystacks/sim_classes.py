@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import copy
 import celluloid as cld
 
+
 class Model:
     def __init__(
             self,
@@ -45,7 +46,7 @@ class Model:
         else:
             assert 0 <= p <= 1
             self.p = p
-            self.n = round(m*p)
+            self.n = math.floor(m*p)
         
         # total number of elements in the system
         self.total_n = self.n * self.s
@@ -78,7 +79,7 @@ class Model:
         else:
             self.avg_util = avg_util
             self.avg_demand = self.total_n * self.avg_util
-            self.n_agents = int(round(self.avg_demand / self.lending_ticks * self.n_ticks))
+            self.n_agents = math.floor(self.avg_demand / self.lending_ticks * self.n_ticks)
                
         
         # dictionary containing the rel. freqs of        

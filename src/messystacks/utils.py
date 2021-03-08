@@ -1,3 +1,12 @@
+import copy
+import math
+import itertools
+import pandas as pd
+import time
+import statistics
+
+from src.messystacks.sim_classes import Model
+
 def create_df_params(params_dict):
     
     # get list of list of values from dict
@@ -12,9 +21,47 @@ def create_df_params(params_dict):
       
     return df
 
+def get_progress(i, max_i):
+    return round((i/max_i)*100)
+
 def run_experiment(df_params, reps, n_cores):
+    
+    df_params = df_params.reset_index(drop=True)
+    
     dfs = []
+    
+    progress = 0
+    comp_times = []
+
+    start_time = time.time()
     for i in df_params.index:
+        
+        progress_temp = get_progress(i, len(df_params))
+        if progress != progress_temp:
+            end_time = time.time()
+            comp_times.append(end_time - start_time)
+            start_time = end_time
+            
+            # mean_time_per_step = sum(comp_times)/len(comp_times)
+            median_time_per_step = statistics.median(comp_times)
+            minutes_running = round(sum(comp_times)/60, 2)
+            hours_running = round(minutes_running/60, 2)
+
+            minutes_remaining = round((median_time_per_step * (100-progress)) / 60, 2)
+            hours_remaining = round(minutes_remaining / 60, 2)
+
+            
+
+            progress = progress_temp
+            
+            print(
+                "progress:", progress, "%", "---",
+                "minutes running:", minutes_running, "---",
+                "hours running:", hours_running, "---",
+                "minutes remaining:", minutes_remaining, "---",
+                "hours remaining:", hours_remaining, "---",
+                )
+        
         params_dict = df_params.iloc[i,:].to_dict()
         model = Model(**params_dict)
         results = model.run(reps = reps, n_cores = n_cores)
